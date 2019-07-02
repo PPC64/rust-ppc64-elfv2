@@ -1,0 +1,34 @@
+--- src/llvm-project/clang/lib/Basic/Targets/PPC.h	2019-04-02 21:19:15.000000000 +0200
++++ src/llvm-project/clang/lib/Basic/Targets/PPC.h	2019-06-28 09:25:10.796440000 +0200
+@@ -374,6 +374,8 @@ class LLVM_LIBRARY_VISIBILITY PPC64TargetInfo : public
+     case llvm::Triple::FreeBSD:
+       LongDoubleWidth = LongDoubleAlign = 64;
+       LongDoubleFormat = &llvm::APFloat::IEEEdouble();
++      if (Triple.getOSMajorVersion() >= 13)
++        ABI = "elfv2";
+       break;
+     default:
+       break;
+--- src/llvm-project/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp	2019-04-02 21:19:15.000000000 +0200
++++ src/llvm-project/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp	2019-06-28 09:24:21.660383000 +0200
+@@ -195,6 +195,20 @@ static PPCTargetMachine::PPCABI computeTargetABI(const
+   if (TT.isMacOSX())
+     return PPCTargetMachine::PPC_ABI_UNKNOWN;
+ 
++  if (TT.isOSFreeBSD()) {
++    switch (TT.getArch()) {
++    case Triple::ppc64le:
++    case Triple::ppc64:
++      if (TT.getOSMajorVersion() >= 13)
++        return PPCTargetMachine::PPC_ABI_ELFv2;
++      else
++        return PPCTargetMachine::PPC_ABI_ELFv1;
++    case Triple::ppc:
++    default:
++      return PPCTargetMachine::PPC_ABI_UNKNOWN;
++    }
++  }
++
+   switch (TT.getArch()) {
+   case Triple::ppc64le:
+     return PPCTargetMachine::PPC_ABI_ELFv2;

@@ -1,0 +1,27 @@
+--- src/librustc_llvm/build.rs.orig	2019-04-08 12:42:31 UTC
++++ src/librustc_llvm/build.rs
+@@ -254,7 +254,10 @@ fn main() {
+     };
+ 
+     // C++ runtime library
+-    if !target.contains("msvc") {
++    if target == "powerpc64-unknown-freebsd" {
++        println!("cargo:rustc-link-search=native=/usr/local/lib/%CC%");
++        println!("cargo:rustc-link-lib=static=stdc++");
++    } else if !target.contains("msvc") {
+         if let Some(s) = llvm_static_stdcpp {
+             assert!(!cxxflags.contains("stdlib=libc++"));
+             let path = PathBuf::from(s);
+--- src/bootstrap/native.rs.orig	2019-05-22 05:39:52 UTC
++++ src/bootstrap/native.rs
+@@ -218,6 +210,10 @@ impl Step for Llvm {
+             }
+         }
+ 
++        if target == "powerpc64-unknown-freebsd" {
++            cfg.define("CMAKE_EXE_LINKER_FLAGS", "-Wl,-rpath=/usr/local/lib/%CC% -L/usr/local/lib/%CC%");
++        }
++
+         // http://llvm.org/docs/HowToCrossCompileLLVM.html
+         if target != builder.config.build && !emscripten {
++             builder.ensure(Llvm {
