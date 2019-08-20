@@ -1,8 +1,8 @@
 # Created by: Jyun-Yan You <jyyou@cs.nctu.edu.tw>
-# $FreeBSD: head/lang/rust/Makefile 506748 2019-07-16 15:49:35Z tobik $
+# $FreeBSD: head/lang/rust/Makefile 508994 2019-08-15 14:30:16Z tobik $
 
 PORTNAME=	rust
-PORTVERSION?=	1.36.0
+PORTVERSION?=	1.37.0
 PORTREVISION?=	0
 CATEGORIES=	lang
 MASTER_SITES=	https://static.rust-lang.org/dist/:src \
@@ -38,15 +38,15 @@ ONLY_FOR_ARCHS_REASON=	requires prebuilt bootstrap compiler
 CONFLICTS_INSTALL?=	rust-nightly
 
 # See WRKSRC/src/stage0.txt for this date and version values.
-BOOTSTRAPS_DATE?=		2019-05-23
+BOOTSTRAPS_DATE?=		2019-07-04
 BOOTSTRAPS_SUFFIX?=		${BOOTSTRAPS_SUFFIX_${ARCH}}
 BOOTSTRAPS_SUFFIX_powerpc64?=	-elfv1
 
-RUST_BOOTSTRAP_VERSION?=	1.35.0
+RUST_BOOTSTRAP_VERSION?=	1.36.0
 RUSTC_BOOTSTRAP=		${BOOTSTRAPS_DATE_${ARCH}:U${BOOTSTRAPS_DATE}}/rustc-${RUST_BOOTSTRAP_VERSION_${ARCH}:U${RUST_BOOTSTRAP_VERSION}}-${RUST_TARGET}
 RUST_STD_BOOTSTRAP=		${BOOTSTRAPS_DATE_${ARCH}:U${BOOTSTRAPS_DATE}}/rust-std-${RUST_BOOTSTRAP_VERSION_${ARCH}:U${RUST_BOOTSTRAP_VERSION}}-${RUST_TARGET}
 
-CARGO_BOOTSTRAP_VERSION?=	0.36.0
+CARGO_BOOTSTRAP_VERSION?=	0.37.0
 CARGO_BOOTSTRAP=		${BOOTSTRAPS_DATE_${ARCH}:U${BOOTSTRAPS_DATE}}/cargo-${CARGO_BOOTSTRAP_VERSION_${ARCH}:U${CARGO_BOOTSTRAP_VERSION}}-${RUST_TARGET}
 
 CARGO_VENDOR_DIR?=		${WRKSRC}/vendor
@@ -139,7 +139,7 @@ post-patch-SOURCES-off:
 	@${REINPLACE_CMD} -e 's/config.tools.*"src".*/false;/' \
 		${WRKSRC}/src/bootstrap/install.rs
 
-.if defined(WITH_CCACHE_BUILD) && !defined(NO_CCACHE)
+.if defined(WITH_CCACHE_BUILD) && !defined(NO_CCACHE) && !defined(NOCCACHE)
 CCACHE_VALUE=	"${CCACHE_WRAPPER_PATH:C,/libexec/ccache$,,}/bin/ccache"
 .else
 CCACHE_VALUE=	false
@@ -254,7 +254,7 @@ makesum:
 	${GREP} ${RUST_ARCH_${arch}} ${DISTINFO_FILE}.${arch} >> ${DISTINFO_FILE}
 	${RM} ${DISTINFO_FILE}.${arch}
 .endfor
-	${MAKE} -D_RUST_MAKESUM_GUARD makesum ARCH=powerpc64 BOOTSTRAPS_SUFFIX="" DISTINFO_FILE=${DISTINFO_FILE}.powerpc64-elfv2
+	${MAKE} -D_RUST_MAKESUM_GUARD makesum ARCH=powerpc64 BOOTSTRAPS_SUFFIX="-elfv2" DISTINFO_FILE=${DISTINFO_FILE}.powerpc64-elfv2
 	${GREP} ${RUST_ARCH_powerpc64} ${DISTINFO_FILE}.powerpc64-elfv2 >> ${DISTINFO_FILE}
 	${RM} ${DISTINFO_FILE}.powerpc64-elfv2
 .endif
