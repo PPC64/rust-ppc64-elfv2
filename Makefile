@@ -76,13 +76,13 @@ PLIST_FILES=		lib/rustlib/components \
 
 .include <bsd.port.pre.mk>
 
-#.if ${ARCH} == powerpc64 && ${OSVERSION} < 1300040
+.if ${ARCH} == powerpc64 && !exists(/usr/bin/clang)
 # The bootstrap is hardcoded to use gcc8
 # but we can build with a newer or older compiler as provided by USE_GCC=yes
 BUILD_DEPENDS+=	gcc8:lang/gcc8
 USE_GCC=	yes
 EXTRA_PATCHES=	${PATCHDIR}/extra-patch-ppc64-gcc
-#.endif
+.endif
 
 .if ${OPSYS} == FreeBSD && ${ARCH} == aarch64 && \
 	(${OSVERSION} < 1200502 || \
@@ -125,7 +125,7 @@ post-patch:
 # Disable vendor checksums
 	@${REINPLACE_CMD} 's,"files":{[^}]*},"files":{},' \
 		${CARGO_VENDOR_DIR}/*/.cargo-checksum.json
-#.if ${OSVERSION} >= 1300040
+.if ${ARCH} == powerpc64 && exists(/usr/bin/clang)
 	@${REINPLACE_CMD} -e \
 		's|Endian::Big => ELFv1|Endian::Big => ELFv2|' \
 		${WRKSRC}/src/librustc_target/abi/call/powerpc64.rs
