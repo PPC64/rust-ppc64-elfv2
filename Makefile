@@ -40,7 +40,7 @@ CONFLICTS_INSTALL?=	rust-nightly
 # See WRKSRC/src/stage0.txt for this date and version values.
 BOOTSTRAPS_DATE?=		2019-07-04
 BOOTSTRAPS_SUFFIX?=		${BOOTSTRAPS_SUFFIX_${ARCH}}
-BOOTSTRAPS_SUFFIX_powerpc64?=	-elfv1
+BOOTSTRAPS_SUFFIX_powerpc64?=	-elfv2
 
 RUST_BOOTSTRAP_VERSION?=	1.36.0
 RUSTC_BOOTSTRAP=		${BOOTSTRAPS_DATE_${ARCH}:U${BOOTSTRAPS_DATE}}/rustc-${RUST_BOOTSTRAP_VERSION_${ARCH}:U${RUST_BOOTSTRAP_VERSION}}-${RUST_TARGET}
@@ -82,6 +82,7 @@ PLIST_FILES=		lib/rustlib/components \
 BUILD_DEPENDS+=	gcc8:lang/gcc8
 USE_GCC=	yes
 EXTRA_PATCHES=	${PATCHDIR}/extra-patch-ppc64-gcc
+BOOTSTRAPS_SUFFIX_powerpc64?=   -elfv1
 .endif
 
 .if ${OPSYS} == FreeBSD && ${ARCH} == aarch64 && \
