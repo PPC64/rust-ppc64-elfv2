@@ -132,7 +132,7 @@ post-patch:
 	@${REINPLACE_CMD} -e \
 		's|powerpc64-unknown-freebsd|powerpc64-unknown-freebsd13.0|' \
 		${WRKSRC}/src/librustc_target/spec/powerpc64_unknown_freebsd.rs
-#.endif
+.endif
 
 post-patch-SOURCES-off:
 # Mimic tools in config.toml with just src excluded
